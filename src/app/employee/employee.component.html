@@ -1,0 +1,50 @@
+<div class="employee-portal">
+  <h2>Welcome to Employee Portal</h2>
+  
+  <!-- Add Employee Button -->
+  <button class="btn btn-primary mb-3" (click)="openModal()">+ Add Employee</button>
+  
+  <p>List of Employees</p>
+
+  <!-- Employee List -->
+  <div class="employee-list">
+    <ul>
+      <li *ngFor="let emp of employees" class="employee-item">
+        <a href="#" (click)="selectEmployee(emp)">{{ emp.name }}</a>
+        <div class="employee-actions">
+          <button class="btn btn-sm btn-warning" (click)="editEmployee(emp)">Edit</button>
+          <button class="btn btn-sm btn-danger" (click)="deleteEmployee(emp.id)">Delete</button>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Selected Employee Details -->
+  <div *ngIf="selectedEmployee" class="employee-details mt-4">
+    <h3>Employee Details</h3>
+    <table border="1" cellpadding="8" style="border-collapse: collapse;">
+      <tr>
+        <th>EmployeeId</th>
+        <th>Salary</th>
+        <th>Department</th>
+        <th>Company</th>
+      </tr>
+      <tr>
+        <td>{{ selectedEmployee.id }}</td>
+        <td>{{ selectedEmployee.salary | currency }}</td>
+        <td>{{ selectedEmployee.department }}</td>
+        <td>{{ selectedEmployee.company?.name }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Modal Component -->
+  <app-employee-modal
+    [showModal]="showModal"
+    [isEditMode]="isEditMode"
+    [form]="form"
+    (close)="closeModal()"
+    (submit)="submitEmployee()"
+    (update)="updateEmployee()"
+  ></app-employee-modal>
+</div>
