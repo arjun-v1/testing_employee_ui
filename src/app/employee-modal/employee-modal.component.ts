@@ -1,6 +1,7 @@
 import { Component,Input, Output, EventEmitter} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Company } from '../employee/employee.service';
 
 @Component({
   selector: 'app-employee-modal',
@@ -11,7 +12,8 @@ import { FormsModule } from '@angular/forms';
 export class EmployeeModalComponent {
  @Input() showModal = false;
   @Input() isEditMode = false;
-  @Input() form = { id: 0, name: '', salary: 0, department: '' };
+  @Input() form = { id: 0, name: '', salary: 0, department: '', companyId: 0 };
+  @Input() companies: Company[] = [];
 
   @Output() close = new EventEmitter<void>();
   @Output() submit = new EventEmitter<void>();
