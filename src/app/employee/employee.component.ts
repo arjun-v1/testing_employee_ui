@@ -15,14 +15,14 @@ import { EmployeeModalComponent } from '../employee-modal/employee-modal.compone
 export class EmployeeComponent implements OnInit {
   employees: Employee[] = [];
   companies: Company[] = [];
-  selectedEmployee: Employee | null = null;
   paginatedEmployees: Employee[] = [];
   currentPage = 1;
-  itemsPerPage = 9;
+  itemsPerPage = 5;
   totalPages = 0;
-  showGrid = false;
   selectedEmployeeId: number | null = null;
   showDeleteConfirm = false;
+  showDetailsModal = false;
+  selectedEmployeeDetails: Employee | null = null;
 
   companyForm: FormGroup;
   showModal = false;
@@ -50,14 +50,7 @@ export class EmployeeComponent implements OnInit {
     this.loadCompanies();
   }
 
-  selectEmployee(emp: Employee, event?: Event) {
-    if (event) {
-      event.preventDefault();
-    }
-    this.showGrid = true;
-    this.selectedEmployee = emp;
-    this.selectedEmployeeId = null; 
-  }
+
 
   updatePagination() {
     this.totalPages = Math.ceil(this.employees.length / this.itemsPerPage);
@@ -95,7 +88,6 @@ export class EmployeeComponent implements OnInit {
       this.deleteEmployee(this.selectedEmployeeId);
       this.showDeleteConfirm = false;
       this.selectedEmployeeId = null;
-      this.showGrid = false; 
     }
   }
 
@@ -126,6 +118,21 @@ export class EmployeeComponent implements OnInit {
     this.showModal = false;
   }
 
+  viewEmployeeDetails(emp: Employee) {
+    this.selectedEmployeeDetails = emp;
+    this.showDetailsModal = true;
+  }
+
+  closeDetailsModal() {
+    this.showDetailsModal = false;
+    this.selectedEmployeeDetails = null;
+  }
+
+  getCompanyName(companyId: number): string {
+    const company = this.companies.find(c => c.id === companyId);
+    return company ? company.name : 'Unknown';
+  }
+
   submitEmployee() {
     const newEmployee = {
       name: this.form.name,
@@ -147,7 +154,6 @@ export class EmployeeComponent implements OnInit {
       next: () => {
         this.loadEmployees();
         this.closeModal();
-        this.showGrid = false; 
       },
       error: (error) => console.error('Error updating employee:', error)
     });
@@ -170,15 +176,6 @@ export class EmployeeComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading employees:', error);
-        // Use mock data when API is not available
-        this.employees = [
-          { id: 1, name: 'John Doe', salary: 50000, department: 'IT', companyId: 1 },
-          { id: 2, name: 'Jane Smith', salary: 60000, department: 'HR', companyId: 1 },
-          { id: 3, name: 'Mike Johnson', salary: 55000, department: 'Finance', companyId: 1 },
-          { id: 4, name: 'Sarah Wilson', salary: 65000, department: 'Marketing', companyId: 1 },
-          { id: 5, name: 'Tom Brown', salary: 52000, department: 'IT', companyId: 1 }
-        ];
-        this.updatePagination();
       }
     });
   }
@@ -192,10 +189,7 @@ export class EmployeeComponent implements OnInit {
   private loadCompanies() {
     this.employeeService.getCompanies().subscribe({
       next: (data) => this.companies = data,
-      error: () => this.companies = [
-        { id: 1, name: 'Tech Corp' },
-        { id: 2, name: 'Business Inc' }
-      ]
+      error: (error) => console.error('Error loading companies:', error)
     });
   }
 }
