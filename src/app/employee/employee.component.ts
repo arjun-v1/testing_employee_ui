@@ -64,6 +64,36 @@ export class EmployeeComponent implements OnInit {
     this.updatePagination();
   }
 
+  goToFirstPage() {
+    this.currentPage = 1;
+    this.updatePagination();
+  }
+
+  goToPreviousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+
+  goToNextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+
+  goToLastPage() {
+    this.currentPage = this.totalPages;
+    this.updatePagination();
+  }
+
+  getCurrentRecordRange(): string {
+    const startRecord = (this.currentPage - 1) * this.itemsPerPage + 1;
+    const endRecord = Math.min(this.currentPage * this.itemsPerPage, this.employees.length);
+    return `${startRecord} records of ${this.employees.length}`;
+  }
+
   selectEmployeeForAction(empId: number) {
     this.selectedEmployeeId = empId;
   }
@@ -133,6 +163,17 @@ export class EmployeeComponent implements OnInit {
     return company ? company.name : 'Unknown';
   }
 
+  sortEmployees(direction: 'asc' | 'desc') {
+    this.employees.sort((a, b) => {
+      if (direction === 'asc') {
+        return a.name.localeCompare(b.name);
+      } else {
+        return b.name.localeCompare(a.name);
+      }
+    });
+    this.updatePagination();
+  }
+
   submitEmployee() {
     const newEmployee = {
       name: this.form.name,
@@ -150,10 +191,12 @@ export class EmployeeComponent implements OnInit {
   }
 
   updateEmployee() {
+    const selectedId = this.selectedEmployeeId;
     this.employeeService.updateEmployee(this.form.id, this.form).subscribe({
       next: () => {
         this.loadEmployees();
         this.closeModal();
+        this.selectedEmployeeId = selectedId;
       },
       error: (error) => console.error('Error updating employee:', error)
     });

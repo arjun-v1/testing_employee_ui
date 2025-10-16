@@ -1,7 +1,7 @@
 <div class="employee-portal">
   <h2 style="text-align: center;">Welcome to Employee Portal</h2>
   
-  <p>List of Employees</p>
+  <p style="color: black; font-weight: bold;">List of Employees</p>
   
   <!-- Global Action Buttons -->
   <div class="global-actions mb-3">
@@ -12,38 +12,45 @@
   
   <!-- Employee Grid -->
   <div class="employee-grid">
-    <table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%;">
+    <table cellpadding="6" style="border-collapse: collapse; width: 100%; border: 1px solid #ccc;">
       <tr>
-        <th>Select</th>
-        <th>Employee Name</th>
-        <th>Salary</th>
-        <th>Department</th>
+        <th style="border: 1px solid #ccc; padding: 6px;">Select</th>
+        <th style="border: 1px solid #ccc; padding: 6px;">Employee Name 
+          <button (click)="sortEmployees('asc')" style="margin-left: 5px; padding: 2px 5px; font-size: 10px;">↑</button>
+          <button (click)="sortEmployees('desc')" style="margin-left: 2px; padding: 2px 5px; font-size: 10px;">↓</button>
+        </th>
+        <th style="border: 1px solid #ccc; padding: 6px;">Salary</th>
+        <th style="border: 1px solid #ccc; padding: 6px;">Department</th>
       </tr>
       <tr *ngFor="let emp of paginatedEmployees">
-        <td>
-          <input type="radio" name="employeeSelect" [value]="emp.id" (change)="selectEmployeeForAction(emp.id)">
+        <td style="border: 1px solid #ccc; padding: 6px;">
+          <input type="radio" name="employeeSelect" [value]="emp.id" [checked]="selectedEmployeeId === emp.id" (change)="selectEmployeeForAction(emp.id)">
         </td>
-        <td><a href="#" (click)="viewEmployeeDetails(emp); $event.preventDefault()" style="color: blue; text-decoration: underline;">{{ emp.name }}</a></td>
-        <td>{{ emp.salary | currency }}</td>
-        <td>{{ emp.department }}</td>
+        <td style="border: 1px solid #ccc; padding: 6px;"><a href="#" (click)="viewEmployeeDetails(emp); $event.preventDefault()" style="color: blue; text-decoration: underline;">{{ emp.name }}</a></td>
+        <td style="border: 1px solid #ccc; padding: 6px;">{{ emp.salary | currency }}</td>
+        <td style="border: 1px solid #ccc; padding: 6px;">{{ emp.department }}</td>
       </tr>
     </table>
   </div>
   
   <!-- Pagination -->
   <div class="pagination mt-3" style="text-align: center; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);">
-    <button 
-      *ngFor="let page of [].constructor(totalPages); let i = index" 
-      class="btn btn-sm" 
-      [class.btn-primary]="currentPage === i + 1"
-      [class.btn-secondary]="currentPage !== i + 1"
-      (click)="goToPage(i + 1)"
-      style="margin-right: 5px;">
-      {{ i + 1 }}
+    <button class="btn btn-sm btn-secondary" (click)="goToFirstPage()" [disabled]="currentPage === 1" style="margin-right: 5px;">
+      ⏮️
+    </button>
+    <button class="btn btn-sm btn-secondary" (click)="goToPreviousPage()" [disabled]="currentPage === 1" style="margin-right: 5px;">
+      ⬅️
+    </button>
+    <span style="margin: 0 10px; color: #333;">{{ getCurrentRecordRange() }}</span>
+    <button class="btn btn-sm btn-secondary" (click)="goToNextPage()" [disabled]="currentPage === totalPages" style="margin-left: 5px;">
+      ➡️
+    </button>
+    <button class="btn btn-sm btn-secondary" (click)="goToLastPage()" [disabled]="currentPage === totalPages" style="margin-left: 5px;">
+      ⏭️
     </button>
   </div>
 
-  <!-- Delete Confirmation Modal -->
+ 
   <div *ngIf="showDeleteConfirm" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1050; display: flex; align-items: flex-start; justify-content: center; padding-top: 50px;">
     <div style="background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 400px; width: 90%;">
       <div style="padding: 20px; border-bottom: 1px solid #dee2e6;">
@@ -66,10 +73,28 @@
         <h5 style="margin: 0; color: #007bff;">Employee Details</h5>
       </div>
       <div style="padding: 20px;" *ngIf="selectedEmployeeDetails">
-        <p><strong>Name:</strong> {{ selectedEmployeeDetails.name }}</p>
-        <p><strong>Salary:</strong> {{ selectedEmployeeDetails.salary | currency }}</p>
-        <p><strong>Department:</strong> {{ selectedEmployeeDetails.department }}</p>
-        <p><strong>Company:</strong> {{ getCompanyName(selectedEmployeeDetails.companyId || 1) }}</p>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="text-align: left; padding: 5px; font-weight: bold;">Name</td>
+            <td style="text-align: center; padding: 5px;">:</td>
+            <td style="text-align: left; padding: 5px;">{{ selectedEmployeeDetails.name }}</td>
+          </tr>
+          <tr>
+            <td style="text-align: left; padding: 5px; font-weight: bold;">Salary</td>
+            <td style="text-align: center; padding: 5px;">:</td>
+            <td style="text-align: left; padding: 5px;">{{ selectedEmployeeDetails.salary | currency }}</td>
+          </tr>
+          <tr>
+            <td style="text-align: left; padding: 5px; font-weight: bold;">Department</td>
+            <td style="text-align: center; padding: 5px;">:</td>
+            <td style="text-align: left; padding: 5px;">{{ selectedEmployeeDetails.department }}</td>
+          </tr>
+          <tr>
+            <td style="text-align: left; padding: 5px; font-weight: bold;">Company</td>
+            <td style="text-align: center; padding: 5px;">:</td>
+            <td style="text-align: left; padding: 5px;">{{ getCompanyName(selectedEmployeeDetails.companyId || 1) }}</td>
+          </tr>
+        </table>
       </div>
       <div style="padding: 20px; text-align: right;">
         <button class="btn btn-secondary" (click)="closeDetailsModal()">Close</button>

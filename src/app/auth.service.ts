@@ -24,7 +24,7 @@ export class AuthService {
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // Initialize authentication state after constructor
+    
     this.isAuthenticatedSubject.next(this.hasToken());
   }
 
